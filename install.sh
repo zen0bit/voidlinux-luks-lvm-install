@@ -4,27 +4,23 @@ set -e
 # Explicitely declare our LV array
 declare -A LV
 
-# Load config or defaults
-if [ -e ./config ]; then
-  . ./config
-else
-  PKG_LIST="base-system lvm2 cryptsetup grub"
-  HOSTNAME="void"
-  KEYMAP="us"
-  TIMEZONE="America/Chicago"
-  LANG="en_US.UTF-8"
-  DEVNAME="nvme0"
-  VGNAME="vgpool"
-  CRYPTSETUP_OPTS=""
-  SWAP=0
-  SWAPSIZE="16G"
-  LV[root]="10G"
-  LV[var]="5G"
-  LV[home]="512M"
-fi
+PKG_LIST="base-system lvm2 cryptsetup grub"
+HOSTNAME="void"
+KEYMAP="us"
+TIMEZONE="America/Chicago"
+LANG="en_US.UTF-8"
+DEVNAME="nvme0n1"
+VGNAME="vgpool"
+CRYPTSETUP_OPTS=""
+SWAP=0
+SWAPSIZE="16G"
+LV[root]="10G"
+LV[var]="5G"
+LV[home]="512M"
 
 # Detect if we're in UEFI or legacy mode
-[ -d /sys/firmware/efi ] && UEFI=1
+# not working[ -d /sys/firmware/efi ] && UEFI=1
+UEFI=1
 if [ $UEFI ]; then
   PKG_LIST="$PKG_LIST grub-x86_64-efi efibootmgr"
 fi
@@ -35,10 +31,10 @@ if [ $CPU_VENDOR = "GenuineIntel" ]; then
   PKG_LIST="$PKG_LIST intel-ucode"
 fi
 
-# Install requirements
+echo "Install requirements"
 xbps-install -y -S -f cryptsetup parted lvm2
 
-# Wipe /dev/${DEVNAME}
+echo "Wipe /dev/${DEVNAME}"
 dd if=/dev/zero of=/dev/${DEVNAME} bs=1M count=100
 if [ $UEFI ]; then
   parted /dev/${DEVNAME} mklabel gpt
@@ -52,10 +48,10 @@ else
 fi
 parted /dev/${DEVNAME} set 1 boot on
 
-# Encrypt partitions
+echo "Encrypt partitions"
 if [ $UEFI ]; then
-  BOOTPART="2"
-  DEVPART="3"
+  BOOTPART="p2"
+  DEVPART="p3"
 else
   BOOTPART="1"
   DEVPART="2"
@@ -71,7 +67,7 @@ cryptsetup ${CRYPTSETUP_OPTS} luksFormat -c aes-xts-plain64 -s 512 /dev/${DEVNAM
 echo "[!] Open root partition"
 cryptsetup luksOpen /dev/${DEVNAME}${DEVPART} crypt-pool
 
-# Now create VG
+echo "Now create VG"
 pvcreate /dev/mapper/crypt-pool
 vgcreate ${VGNAME} /dev/mapper/crypt-pool
 for FS in ${!LV[@]}; do
@@ -81,9 +77,9 @@ if [ $SWAP -eq 1 ]; then
   lvcreate -L ${SWAPSIZE} -n swap ${VGNAME}
 fi
 
-# Format filesystems
+echo "Format filesystems"
 if [ $UEFI ]; then
-  mkfs.vfat /dev/${DEVNAME}1
+  mkfs.vfat /dev/${DEVNAME}p1
 fi
 mkfs.ext4 -L boot /dev/mapper/crypt-boot
 for FS in ${!LV[@]}; do
@@ -94,13 +90,13 @@ if [ $SWAP -eq 1 ]; then
 fi
 
 
-# Mount them
+echo "Mount them"
 mount /dev/mapper/${VGNAME}-root /mnt
 for dir in dev proc sys boot; do
   mkdir /mnt/${dir}
 done
 
-## Remove root and sort keys
+echo "Remove root and sort keys"
 unset LV[root]
 for FS in $(for key in "${!LV[@]}"; do printf '%s\n' "$key"; done| sort); do
   mkdir -p /mnt/${FS}
@@ -110,7 +106,7 @@ done
 if [ $UEFI ]; then
   mount /dev/mapper/crypt-boot /mnt/boot
   mkdir /mnt/boot/efi
-  mount /dev/${DEVNAME}1 /mnt/boot/efi
+  mount /dev/${DEVNAME}p1 /mnt/boot/efi
 else
   mount /dev/mapper/crypt-boot /mnt/boot
 fi
@@ -171,17 +167,3 @@ echo "GRUB_CMDLINE_LINUX=\"rd.vconsole.keymap=${KEYMAP} rd.lvm=1 rd.luks=1 rd.lu
 
 chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 chroot /mnt xbps-reconfigure -f ${KERNEL_VER}
-
-# Now add customization to installation
-echo "[!] Running custom scripts"
-if [ -d ./custom ]; then
-  cp -r ./custom /mnt/tmp
-
-  # If we detect any .sh let's run them in the chroot
-  for SHFILE in /mnt/tmp/custom/*.sh; do
-    chroot /mnt sh /tmp/custom/$(basename $SHFILE)
-  done
-
-  # Then cleanup chroot
-  rm -rf /mnt/tmp/custom
-fi
