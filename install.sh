@@ -13,7 +13,7 @@ else
   KEYMAP="us"
   TIMEZONE="America/Chicago"
   LANG="en_US.UTF-8"
-  DEVNAME="sda"
+  DEVNAME="nvme0"
   VGNAME="vgpool"
   CRYPTSETUP_OPTS=""
   SWAP=0

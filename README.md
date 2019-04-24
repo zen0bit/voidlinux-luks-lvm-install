@@ -1,10 +1,13 @@
 Fork from https://git.mauras.ch/voidlinux/luks-lvm-install
-Additional credit to https://www.daveeddy.com/2018/09/05/encrypted-void-linux-install-on-my-thinkpad-x1-carbon/
+Additional credit to 
+- https://www.daveeddy.com/2018/09/05/encrypted-void-linux-install-on-my-thinkpad-x1-carbon/
+- https://www.daveeddy.com/2018/09/15/using-void-linux-as-my-daily-driver/
+- https://alkusin.net/voidlinux/
 
 Voidlinux LUKS + LVM installer
 ------------------------------
 
-Basic install script that replaces completely the standard VoidLinux installer.  
+Basic install script that replaces the standard VoidLinux installer.  
 
 ### Features
 
@@ -18,17 +21,18 @@ Basic install script that replaces completely the standard VoidLinux installer.
 ### Usage
 
 - Boot a VoidLinux LiveCD
-- Setup your network
-- Install Git `xbps-install -S git`
+- Setup your network 
+```
+# wpa_passphrase 'ssid' >> /etc/wpa_supplicant/wpa_supplicant.conf
+password<enter>
+# sv restart dhcpcd
+```
+- Install wget `xbps-install -S wget`
 
 Then:
 
 ```
-git clone https://github.com/egyb2h9/voidlinux-luks-lvm-install.git
-cd voidlinux-luks-lvm-install
-```
-Edit `config` to your taste.  
-If needed put your `.sh` scripts in custom dir - see examples - before running `install.sh`  
-```
+wget https://raw.githubusercontent.com/egyb2h9/voidlinux-luks-lvm-install/master/install.sh
+chmod +x install.sh
 ./install.sh
 ```
