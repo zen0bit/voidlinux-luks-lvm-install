@@ -10,8 +10,8 @@ if [ -e ./config ]; then
 else
   PKG_LIST="base-system lvm2 cryptsetup grub"
   HOSTNAME="dom1.internal"
-  KEYMAP="fr_CH"
-  TIMEZONE="Europe/Zurich"
+  KEYMAP="us"
+  TIMEZONE="America/Chicago"
   LANG="en_US.UTF-8"
   DEVNAME="sda"
   VGNAME="vgpool"
@@ -123,7 +123,7 @@ done
 mkdir -p /mnt/var/db/xbps/keys/
 cp -a /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
 
-xbps-install -y -S -R http://repo.voidlinux.eu/current -r /mnt $PKG_LIST
+xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/live/current/ -r /mnt $PKG_LIST
 
 # Do a bit of customization
 echo "[!] Setting root password"
