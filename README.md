@@ -24,7 +24,7 @@ Basic install script that replaces completely the standard VoidLinux installer.
 Then:
 
 ```
-git clone http://git.mauras.ch/voidlinux/https://github.com/egyb2h9/voidlinux-luks-lvm-install.git
+git clone https://github.com/egyb2h9/voidlinux-luks-lvm-install.git
 cd voidlinux-luks-lvm-install
 ```
 Edit `config` to your taste.  

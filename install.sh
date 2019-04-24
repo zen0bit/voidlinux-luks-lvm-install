@@ -9,7 +9,7 @@ if [ -e ./config ]; then
   . ./config
 else
   PKG_LIST="base-system lvm2 cryptsetup grub"
-  HOSTNAME="dom1.internal"
+  HOSTNAME="void"
   KEYMAP="us"
   TIMEZONE="America/Chicago"
   LANG="en_US.UTF-8"
