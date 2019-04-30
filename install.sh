@@ -58,7 +58,7 @@ else
 fi
 
 echo "[!] Encrypt boot partition"
-cryptsetup "${CRYPTSETUP_OPTS}" luksFormat -c aes-xts-plain64 -s 512 /dev/"${DEVNAME}""${BOOTPART}"
+cryptsetup ${CRYPTSETUP_OPTS} luksFormat -c aes-xts-plain64 -s 512 /dev/"${DEVNAME}""${BOOTPART}"
 echo "[!] Open boot partition"
 cryptsetup luksOpen /dev/"${DEVNAME}""${BOOTPART}" crypt-boot
 
@@ -119,7 +119,7 @@ done
 mkdir -p /mnt/var/db/xbps/keys/
 cp -a /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
 
-xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/live/current/ -r /mnt "$PKG_LIST"
+xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current/ -r /mnt "$PKG_LIST"
 
 # Do a bit of customization
 echo "[!] Setting root password"
