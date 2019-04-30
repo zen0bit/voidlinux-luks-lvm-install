@@ -91,7 +91,7 @@ fi
 
 
 echo "Mount them"
-mount /dev/mapper/$"{VGNAME}"-root /mnt
+mount /dev/mapper/"${VGNAME}"-root /mnt
 for dir in dev proc sys boot; do
   mkdir /mnt/"${dir}"
 done
@@ -119,7 +119,7 @@ done
 mkdir -p /mnt/var/db/xbps/keys/
 cp -a /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
 
-xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current/ -r /mnt "$PKG_LIST"
+xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current -r /mnt "$PKG_LIST"
 
 # Do a bit of customization
 echo "[!] Setting root password"
