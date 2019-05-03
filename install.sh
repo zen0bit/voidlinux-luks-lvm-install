@@ -123,7 +123,7 @@ xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current -r /mnt $PKG_LIST
 
 # Do a bit of customization
 echo "[!] Setting root password"
-passwd -R /mnt root
+chroot /mnt passwd root
 echo "$HOSTNAME" > /mnt/etc/hostname
 echo "TIMEZONE=${TIMEZONE}" >> /mnt/etc/rc.conf
 echo "KEYMAP=${KEYMAP}" >> /mnt/etc/rc.conf
