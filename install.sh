@@ -25,12 +25,6 @@ if [ "$UEFI" ]; then
   PKG_LIST="$PKG_LIST grub-x86_64-efi efibootmgr"
 fi
 
-# Detect if we're on an Intel system
-CPU_VENDOR=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')
-if [ $CPU_VENDOR = "GenuineIntel" ]; then
-  PKG_LIST="$PKG_LIST intel-ucode"
-  xbps-install -y void-repo-nonfree
-fi
 
 echo "Install requirements"
 xbps-install -y -S -f cryptsetup parted lvm2
@@ -121,6 +115,12 @@ mkdir -p /mnt/var/db/xbps/keys/
 cp -a /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
 
 xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current -r /mnt $PKG_LIST
+
+# Detect if we're on an Intel system
+CPU_VENDOR=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')
+if [ $CPU_VENDOR = "GenuineIntel" ]; then
+  xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current/nonfree -r /mnt intel-ucode
+fi
 
 # Do a bit of customization
 echo "[!] Setting root password"
