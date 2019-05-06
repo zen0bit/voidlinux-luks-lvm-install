@@ -26,9 +26,10 @@ if [ "$UEFI" ]; then
 fi
 
 # Detect if we're on an Intel system
-CPU_VENDOR=$(grep vendor_id /proc/cpuinfo | awk '{print $3}')
+CPU_VENDOR=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')
 if [ $CPU_VENDOR = "GenuineIntel" ]; then
   PKG_LIST="$PKG_LIST intel-ucode"
+  xbps-install -y void-repo-nonfree
 fi
 
 echo "Install requirements"
