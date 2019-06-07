@@ -100,7 +100,7 @@ done
 if [ "$UEFI" ]; then
   mount /dev/mapper/crypt-boot /mnt/boot
   mkdir /mnt/boot/efi
-  mount /dev/"${DEVNAME}"p1 /mnt/boot/efi
+  mount /dev/"${DEVNAME}"1 /mnt/boot/efi
 else
   mount /dev/mapper/crypt-boot /mnt/boot
 fi
