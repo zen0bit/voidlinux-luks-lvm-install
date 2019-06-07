@@ -1,4 +1,5 @@
-Fork from https://git.mauras.ch/voidlinux/luks-lvm-install
+Fork from https://github.com/egyb2h9/voidlinux-luks-lvm-install
+which was Forked from https://git.mauras.ch/voidlinux/luks-lvm-install
 Additional credit to 
 - https://www.daveeddy.com/2018/09/05/encrypted-void-linux-install-on-my-thinkpad-x1-carbon/
 - https://www.daveeddy.com/2018/09/15/using-void-linux-as-my-daily-driver/
@@ -32,7 +33,7 @@ password<enter>
 Then:
 
 ```
-wget https://raw.githubusercontent.com/egyb2h9/voidlinux-luks-lvm-install/master/install.sh
+wget https://raw.githubusercontent.com/foodotooo/voidlinux-luks-lvm-install/master/install.sh
 chmod +x install.sh
 ./install.sh
 ```
