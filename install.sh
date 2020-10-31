@@ -5,11 +5,11 @@ set -e
 declare -A LV
 
 PKG_LIST="base-system lvm2 cryptsetup grub"
-HOSTNAME="void"
+HOSTNAME="void-x220"
 KEYMAP="us"
-TIMEZONE="America/Chicago"
+TIMEZONE="Europe/London"
 LANG="en_US.UTF-8"
-DEVNAME="nvme0n1"
+DEVNAME="sda"
 VGNAME="vgpool"
 CRYPTSETUP_OPTS=""
 SWAP=1
@@ -25,28 +25,28 @@ if [ "$UEFI" ]; then
   PKG_LIST="$PKG_LIST grub-x86_64-efi efibootmgr"
 fi
 
-
 echo "Install requirements"
 xbps-install -y -S -f cryptsetup parted lvm2
 
-echo "Wipe /dev/${DEVNAME}"
-dd if=/dev/zero of=/dev/"${DEVNAME}" bs=1M count=100
-if [ "$UEFI" ]; then
-  parted /dev/"${DEVNAME}" mklabel gpt
-  parted -a optimal /dev/"${DEVNAME}" mkpart primary 2048s 100M
-  parted -a optimal /dev/"${DEVNAME}" mkpart primary 100M 612M
-  parted -a optimal /dev/"${DEVNAME}" mkpart primary 612M 100%
-else
-  parted /dev/"${DEVNAME}" mklabel msdos
-  parted -a optimal /dev/"${DEVNAME}" mkpart primary 2048s 512M
-  parted -a optimal /dev/"${DEVNAME}" mkpart primary 512M 100%
-fi
-parted /dev/"${DEVNAME}" set 1 boot on
+# echo "Wipe /dev/${DEVNAME}"
+# dd if=/dev/zero of=/dev/"${DEVNAME}" bs=1M count=100
+# cfdisk -z /dev/${DEVNAME}
+#if [ "$UEFI" ]; then
+#  parted /dev/"${DEVNAME}" mklabel gpt
+#  parted -a optimal /dev/"${DEVNAME}" mkpart primary 2048s 100M
+#  parted -a optimal /dev/"${DEVNAME}" mkpart primary 100M 612M
+#  parted -a optimal /dev/"${DEVNAME}" mkpart primary 612M 100%
+#else
+#  parted /dev/"${DEVNAME}" mklabel msdos
+#  parted -a optimal /dev/"${DEVNAME}" mkpart primary 2048s 512M
+#  parted -a optimal /dev/"${DEVNAME}" mkpart primary 512M 100%
+#fi
+#parted /dev/"${DEVNAME}" set 1 boot on
 
 echo "Encrypt partitions"
 if [ "$UEFI" ]; then
-  BOOTPART="p2"
-  DEVPART="p3"
+  BOOTPART="2"
+  DEVPART="3"
 else
   BOOTPART="1"
   DEVPART="2"
@@ -74,7 +74,7 @@ fi
 
 echo "Format filesystems"
 if [ "$UEFI" ]; then
-  mkfs.vfat /dev/"${DEVNAME}"p1
+  mkfs.vfat /dev/"${DEVNAME}"1
 fi
 mkfs.ext4 -L boot /dev/mapper/crypt-boot
 for FS in ${!LV[@]}; do
@@ -101,7 +101,7 @@ done
 if [ "$UEFI" ]; then
   mount /dev/mapper/crypt-boot /mnt/boot
   mkdir /mnt/boot/efi
-  mount /dev/"${DEVNAME}"p1 /mnt/boot/efi
+  mount /dev/"${DEVNAME}"1 /mnt/boot/efi
 else
   mount /dev/mapper/crypt-boot /mnt/boot
 fi
@@ -119,7 +119,7 @@ xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current -r /mnt $PKG_LIST
 # Detect if we're on an Intel system
 CPU_VENDOR=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')
 if [ $CPU_VENDOR = "GenuineIntel" ]; then
-  xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current/nonfree -r /mnt intel-ucode
+xbps-install -y -S -R https://a-hel-fi.m.voidlinux.org/current/nonfree -r /mnt intel-ucode
 fi
 
 # Do a bit of customization
